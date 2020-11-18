@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SpaDay.Models;
+using SpaDay.ViewModel;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,10 +12,15 @@ namespace SpaDay.Controllers
 {
     public class UserController : Controller
     {
+        public string UserName { get; private set; }
+        public string Email { get; private set; }
+        public string Password { get; private set; }
+
         // GET: /<controller>/
         public IActionResult Index()
         {
-            return View();
+            AddUserViewModel User = new AddUserViewModel();
+            return View(User);
         }
 
         public IActionResult Add()
@@ -24,20 +30,28 @@ namespace SpaDay.Controllers
 
         [HttpPost]
         [Route("/user")]
-        public IActionResult SubmitAddUserForm(User newUser, string verify)
+        public IActionResult SubmitAddUserForm(AddUserViewModel User)
         {
-            if (newUser.Password == verify)
+            if (ModelState.IsValid)
             {
-                ViewBag.user = newUser;
-                return View("Index");
+                if(User.Password == User.VerifyPassword)
+                {
+                    User newUser = new User();
+                    UserName = User.UserName;
+                    Email = User.Email;
+                    Password = User.Password;
+                    return View("Index", newUser);
+                }
+                else
+                {
+                    ViewBag.error = "Passwords do not match! Try again!";
+                    ViewBag.UserName = User.UserName;
+                    ViewBag.Email = User.Email;
+                    return View("Add", User);
+                }
             }
-            else
-            {
-                ViewBag.error = "Passwords do not match! Try again!";
-                ViewBag.userName = newUser.Username;
-                ViewBag.eMail = newUser.Email;
-                return View("Add");
-            }
+
+            return View("add", User);
         }
 
     }
