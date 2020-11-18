@@ -36,10 +36,13 @@ namespace SpaDay.Controllers
             {
                 if(User.Password == User.VerifyPassword)
                 {
-                    User newUser = new User();
-                    UserName = User.UserName;
-                    Email = User.Email;
-                    Password = User.Password;
+                    User newUser = new User
+                    {
+                        UserName = User.UserName,
+                        Email = User.Email,
+                        Password = User.Password,
+                    };
+
                     return View("Index", newUser);
                 }
                 else
